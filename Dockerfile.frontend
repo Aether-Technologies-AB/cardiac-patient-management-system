@@ -1,0 +1,24 @@
+# Frontend Dockerfile
+FROM node:18-alpine
+
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json for client
+COPY client/package*.json ./client/
+
+# Install client dependencies
+RUN npm install --prefix client
+
+# Copy client source
+COPY client/ ./client/
+
+# Build the React app
+RUN npm run build --prefix client
+
+# Serve the built app (you might use a more production-ready server like Nginx)
+# For simplicity, we'll use 'serve'
+RUN npm install -g serve
+
+EXPOSE 3000
+
+CMD [ "serve", "-s", "client/build", "-l", "3000" ]
