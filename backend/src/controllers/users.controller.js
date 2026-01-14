@@ -1,14 +1,19 @@
-const User = require('../models/User');
+const User = require('../models/UserFirebase');
 
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private/Admin
 const getUsers = async (req, res, next) => {
   try {
-    const users = await User.findAll({
-      attributes: { exclude: ['password_hash'] }
+    const users = await User.findAll();
+    
+    // Remove passwords from response
+    const usersWithoutPasswords = users.map(user => {
+      const { password_hash, ...userWithoutPassword } = user;
+      return userWithoutPassword;
     });
-    res.status(200).json({ success: true, count: users.length, data: users });
+    
+    res.status(200).json({ success: true, count: usersWithoutPasswords.length, data: usersWithoutPasswords });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
@@ -20,7 +25,6 @@ const getUsers = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const user = await User.create(req.body);
-    // Password will be hashed by the model hook
     res.status(201).json({ success: true, data: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -32,7 +36,7 @@ const createUser = async (req, res, next) => {
 // @access  Private/Admin
 const updateUser = async (req, res, next) => {
   try {
-    let user = await User.findByPk(req.params.id);
+    let user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -41,7 +45,7 @@ const updateUser = async (req, res, next) => {
     // Prevent password hash from being updated directly here
     delete req.body.password_hash;
 
-    user = await user.update(req.body);
+    user = await User.update(req.params.id, req.body);
 
     res.status(200).json({ success: true, data: { id: user.id, email: user.email, role: user.role } });
   } catch (error) {
@@ -54,13 +58,13 @@ const updateUser = async (req, res, next) => {
 // @access  Private/Admin
 const deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    await user.update({ is_active: false });
+    await User.update(req.params.id, { is_active: false });
 
     res.status(200).json({ success: true, data: {} });
   } catch (error) {

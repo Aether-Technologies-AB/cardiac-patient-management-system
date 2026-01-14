@@ -1,17 +1,12 @@
-const Patient = require('../models/Patient');
-const User = require('../models/User');
-const { Op } = require('sequelize');
-// const { broadcast } = require('../services/notification.service');
+const Patient = require('../models/PatientFirebase');
+const User = require('../models/UserFirebase');
 
 // @desc    Get all patients
 // @route   GET /api/patients
 // @access  Private
 const getPatients = async (req, res, next) => {
   try {
-    const patients = await Patient.findAll({
-      include: [{ model: User, attributes: ['first_name', 'last_name'] }],
-      order: [['created_at', 'DESC']]
-    });
+    const patients = await Patient.findAll();
     res.status(200).json({ success: true, count: patients.length, data: patients });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
@@ -23,7 +18,7 @@ const getPatients = async (req, res, next) => {
 // @access  Private
 const getPatient = async (req, res, next) => {
   try {
-    const patient = await Patient.findByPk(req.params.id);
+    const patient = await Patient.findById(req.params.id);
 
     if (!patient) {
       return res.status(404).json({ success: false, message: 'Patient not found' });
@@ -43,19 +38,9 @@ const createPatient = async (req, res, next) => {
     req.body.created_by = req.user.id;
     const patient = await Patient.create(req.body);
 
-    // Broadcast a notification - temporarily disabled
-    // broadcast({
-    //   type: 'NEW_PATIENT',
-    //   payload: {
-    //     id: patient.id,
-    //     name: `${patient.first_name} ${patient.last_name}`,
-    //     message: 'A new patient has been registered.'
-    //   }
-    // });
-
     res.status(201).json({ success: true, data: patient });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
@@ -64,13 +49,13 @@ const createPatient = async (req, res, next) => {
 // @access  Private
 const updatePatient = async (req, res, next) => {
   try {
-    let patient = await Patient.findByPk(req.params.id);
+    let patient = await Patient.findById(req.params.id);
 
     if (!patient) {
       return res.status(404).json({ success: false, message: 'Patient not found' });
     }
 
-    patient = await patient.update(req.body);
+    patient = await Patient.update(req.params.id, req.body);
 
     res.status(200).json({ success: true, data: patient });
   } catch (error) {
@@ -83,13 +68,13 @@ const updatePatient = async (req, res, next) => {
 // @access  Private
 const deletePatient = async (req, res, next) => {
   try {
-    const patient = await Patient.findByPk(req.params.id);
+    const patient = await Patient.findById(req.params.id);
 
     if (!patient) {
       return res.status(404).json({ success: false, message: 'Patient not found' });
     }
 
-    await patient.destroy();
+    await Patient.delete(req.params.id);
 
     res.status(200).json({ success: true, data: {} });
   } catch (error) {

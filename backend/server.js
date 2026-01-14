@@ -2,7 +2,7 @@ const http = require('http');
 require('dotenv').config({ path: __dirname + '/../.env' });
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./src/config/database');
+const { db } = require('./src/config/firebase');
 
 const app = express();
 
@@ -12,8 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Database connection test
-sequelize.authenticate()
-  .then(() => console.log('Database connected...'))
+db.collection('test').doc('connection').set({ connected: true, timestamp: new Date() })
+  .then(() => console.log('Firebase connected...'))
   .catch(err => console.log('Error: ' + err));
 
 // Mount routers
@@ -22,14 +22,14 @@ app.use('/api/patients', require('./src/routes/patients.routes'));
 app.use('/api/users', require('./src/routes/users.routes'));
 app.use("/api/dashboard", require("./src/routes/dashboard.routes"));
 
-// Mount single-resource routes
-const { single: singleLabRouter } = require('./src/routes/labs.routes');
-const { single: singleDiagnosisRouter } = require('./src/routes/diagnoses.routes');
-const { single: singleProcedureRouter } = require('./src/routes/procedures.routes');
+// Mount single-resource routes (temporarily disabled - need Firebase migration)
+// const { single: singleLabRouter } = require('./src/routes/labs.routes');
+// const { single: singleDiagnosisRouter } = require('./src/routes/diagnoses.routes');
+// const { single: singleProcedureRouter } = require('./src/routes/procedures.routes');
 
-app.use('/api/labs', singleLabRouter);
-app.use('/api/diagnoses', singleDiagnosisRouter);
-app.use('/api/procedures', singleProcedureRouter);
+// app.use('/api/labs', singleLabRouter);
+// app.use('/api/diagnoses', singleDiagnosisRouter);
+// app.use('/api/procedures', singleProcedureRouter);
 
 // Basic route
 app.get('/', (req, res) => {

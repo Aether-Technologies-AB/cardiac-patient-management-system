@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/UserFirebase');
 
 // Protect routes
 const protect = async (req, res, next) => {
@@ -14,9 +14,12 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get user from the token
-      req.user = await User.findByPk(decoded.id, {
-        attributes: { exclude: ['password_hash'] }
-      });
+      req.user = await User.findById(decoded.id);
+      
+      // Remove password from user object
+      if (req.user) {
+        delete req.user.password_hash;
+      }
 
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'Not authorized, user not found' });

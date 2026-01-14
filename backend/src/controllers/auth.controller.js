@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/UserFirebase');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT
@@ -16,7 +16,7 @@ const register = async (req, res, next) => {
 
   try {
     // Check if user already exists
-    let user = await User.findOne({ where: { email } });
+    let user = await User.findByEmail(email);
 
     if (user) {
       return res.status(400).json({ success: false, message: 'User already exists' });
@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
       first_name,
       last_name,
       email,
-      password_hash: password, // The model hook will hash this
+      password_hash: password, // The model will hash this
       role: role || 'staff', // Default role to 'staff'
       specialty,
       license_number
@@ -53,14 +53,14 @@ const login = async (req, res, next) => {
 
   try {
     // Check for user
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findByEmail(email);
 
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Check if password matches
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await User.matchPassword(password, user.password_hash);
 
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });

@@ -1,125 +1,105 @@
 const express = require('express');
 const router = express.Router();
-const sequelize = require('../config/database');
+const { db } = require('../config/firebase');
 
 router.get('/stats', async (req, res) => {
   try {
+    // Get all patients
+    const patientsSnapshot = await db.collection('patients').get();
+    const patients = patientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
     // Basic counts
-    const [patientCount] = await sequelize.query('SELECT COUNT(*) as count FROM patients');
-    const [diagnosisCount] = await sequelize.query('SELECT COUNT(*) as count FROM diagnoses');
-    const [vitalCount] = await sequelize.query('SELECT COUNT(*) as count FROM vital_signs');
-    const [medCount] = await sequelize.query('SELECT COUNT(*) as count FROM medications');
+    const totalPatients = patients.length;
+    const totalDiagnoses = 0; // Will be 0 until diagnoses are migrated
+    const totalVitals = 0; // Will be 0 until vitals are migrated
+    const totalMedications = 0; // Will be 0 until medications are migrated
     
     // Cardiac-specific metrics
-    const [riskFactors] = await sequelize.query(`
-      SELECT 
-        COUNT(*) FILTER (WHERE hta = true) as hta_count,
-        COUNT(*) FILTER (WHERE diabetes_mellitus = true) as diabetes_count,
-        COUNT(*) FILTER (WHERE dislipidemia = true) as dislipidemia_count,
-        COUNT(*) FILTER (WHERE tabaquismo = true) as smoking_count,
-        COUNT(*) FILTER (WHERE sedentarismo = true) as sedentary_count,
-        COUNT(*) FILTER (WHERE obesidad_sobrepeso = true) as obesity_count,
-        COUNT(*) FILTER (WHERE ansiedad_depresion = true) as anxiety_count,
-        COUNT(*) FILTER (WHERE consumo_alcohol = true) as alcohol_count
-      FROM patients
-    `);
+    const riskFactors = {
+      hta: patients.filter(p => p.hta).length,
+      diabetes: patients.filter(p => p.diabetes_mellitus).length,
+      dislipidemia: patients.filter(p => p.dislipidemia).length,
+      smoking: patients.filter(p => p.tabaquismo).length,
+      sedentary: patients.filter(p => p.sedentarismo).length,
+      obesity: patients.filter(p => p.obesidad_sobrepeso).length,
+      anxiety: patients.filter(p => p.ansiedad_depresion).length,
+      alcohol: patients.filter(p => p.consumo_alcohol).length
+    };
     
     // Age demographics
-    const [ageDistribution] = await sequelize.query(`
-      SELECT 
-        CASE 
-          WHEN age < 50 THEN '<50'
-          WHEN age BETWEEN 50 AND 65 THEN '50-65'
-          WHEN age > 65 THEN '>65'
-        END as age_group,
-        COUNT(*) as count
-      FROM (
-        SELECT 
-          id,
-          EXTRACT(YEAR FROM AGE(date_of_birth)) as age
-        FROM patients
-      ) age_data
-      GROUP BY age_group
-      ORDER BY age_group
-    `);
+    const ageDistribution = patients.reduce((acc, patient) => {
+      if (!patient.date_of_birth) return acc;
+      
+      const age = calculateAge(patient.date_of_birth);
+      let ageGroup;
+      if (age < 50) ageGroup = '<50';
+      else if (age >= 50 && age <= 65) ageGroup = '50-65';
+      else ageGroup = '>65';
+      
+      const existing = acc.find(item => item.age_group === ageGroup);
+      if (existing) {
+        existing.count++;
+      } else {
+        acc.push({ age_group: ageGroup, count: 1 });
+      }
+      return acc;
+    }, []).sort((a, b) => a.age_group.localeCompare(b.age_group));
     
     // High-risk patients (3+ risk factors)
-    const [highRiskPatients] = await sequelize.query(`
-      SELECT COUNT(*) as count
-      FROM (
-        SELECT 
-          id,
-          (hta::int + diabetes_mellitus::int + dislipidemia::int + 
-           tabaquismo::int + sedentarismo::int + obesidad_sobrepeso::int + 
-           ansiedad_depresion::int + consumo_alcohol::int) as risk_count
-        FROM patients
-      ) risk_data
-      WHERE risk_count >= 3
-    `);
+    const highRiskPatients = patients.filter(patient => {
+      const riskCount = [
+        patient.hta,
+        patient.diabetes_mellitus,
+        patient.dislipidemia,
+        patient.tabaquismo,
+        patient.sedentarismo,
+        patient.obesidad_sobrepeso,
+        patient.ansiedad_depresion,
+        patient.consumo_alcohol
+      ].filter(Boolean).length;
+      return riskCount >= 3;
+    }).length;
     
-    // Latest blood pressure averages
-    const [bpStats] = await sequelize.query(`
-      SELECT 
-        AVG(systolic_bp) as avg_systolic,
-        AVG(diastolic_bp) as avg_diastolic,
-        COUNT(*) as total_readings
-      FROM (
-        SELECT DISTINCT ON (patient_id) 
-          systolic_bp, diastolic_bp, patient_id
-        FROM vital_signs
-        ORDER BY patient_id, recorded_at DESC
-      ) latest_vitals
-    `);
+    // Blood pressure metrics (0 until vitals migrated)
+    const bpStats = {
+      avg_systolic: 0,
+      avg_diastolic: 0,
+      total_readings: 0
+    };
     
     // CALM program enrollment
-    const [calmStats] = await sequelize.query(`
-      SELECT 
-        COUNT(*) FILTER (WHERE calm_program_date IS NOT NULL) as enrolled_count,
-        COUNT(*) as total_count
-      FROM patients
-    `);
-    
-    const riskData = riskFactors[0];
-    const ageData = ageDistribution;
-    const bpData = bpStats[0];
-    const calmData = calmStats[0];
+    const calmStats = {
+      enrolled_count: patients.filter(p => p.calm_program_date).length,
+      total_count: totalPatients
+    };
     
     res.json({
       success: true,
       data: {
         // Basic metrics
-        totalPatients: parseInt(patientCount[0].count),
-        totalDiagnoses: parseInt(diagnosisCount[0].count),
-        totalVitals: parseInt(vitalCount[0].count),
-        totalMedications: parseInt(medCount[0].count),
+        totalPatients,
+        totalDiagnoses,
+        totalVitals,
+        totalMedications,
         
         // Cardiac risk metrics
-        riskFactors: {
-          hta: parseInt(riskData.hta_count),
-          diabetes: parseInt(riskData.diabetes_count),
-          dislipidemia: parseInt(riskData.dislipidemia_count),
-          smoking: parseInt(riskData.smoking_count),
-          sedentary: parseInt(riskData.sedentary_count),
-          obesity: parseInt(riskData.obesity_count),
-          anxiety: parseInt(riskData.anxiety_count),
-          alcohol: parseInt(riskData.alcohol_count)
-        },
+        riskFactors,
         
         // High-risk patients
-        highRiskPatients: parseInt(highRiskPatients[0].count),
-        highRiskPercentage: Math.round((highRiskPatients[0].count / patientCount[0].count) * 100),
+        highRiskPatients,
+        highRiskPercentage: totalPatients > 0 ? Math.round((highRiskPatients / totalPatients) * 100) : 0,
         
         // Blood pressure metrics
-        avgSystolicBP: Math.round(bpData.avg_systolic || 0),
-        avgDiastolicBP: Math.round(bpData.avg_diastolic || 0),
-        bpReadingsCount: parseInt(bpData.total_readings || 0),
+        avgSystolicBP: Math.round(bpStats.avg_systolic || 0),
+        avgDiastolicBP: Math.round(bpStats.avg_diastolic || 0),
+        bpReadingsCount: parseInt(bpStats.total_readings || 0),
         
         // Age distribution
-        ageDistribution: ageData,
+        ageDistribution,
         
         // CALM program
-        calmProgramEnrollment: parseInt(calmData.enrolled_count),
-        calmProgramPercentage: Math.round((calmData.enrolled_count / calmData.total_count) * 100)
+        calmProgramEnrollment: parseInt(calmStats.enrolled_count),
+        calmProgramPercentage: calmStats.total_count > 0 ? Math.round((calmStats.enrolled_count / calmStats.total_count) * 100) : 0
       }
     });
   } catch (error) {
@@ -127,5 +107,18 @@ router.get('/stats', async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
+// Helper function to calculate age
+function calculateAge(dateOfBirth) {
+  if (!dateOfBirth) return null;
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
 
 module.exports = router;
