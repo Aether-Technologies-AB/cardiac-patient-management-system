@@ -131,33 +131,44 @@ const DashboardHome = () => {
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Pacientes de Alto Riesgo</p>
-              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#ef4444' }}>{stats.highRiskPatients}</p>
-              <p style={{ color: '#ef4444', fontSize: '14px', marginTop: '4px' }}>{stats.highRiskPercentage}% del total</p>
+              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Signos Vitales Registrados</p>
+              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#3b82f6' }}>{stats.clinicalMetrics?.totalVitalsRecorded || 0}</p>
+              <p style={{ color: '#3b82f6', fontSize: '14px', marginTop: '4px' }}>Mediciones totales</p>
             </div>
-            <div style={{ fontSize: '36px' }}>⚠️</div>
+            <div style={{ fontSize: '36px' }}>📈</div>
           </div>
         </div>
 
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Presión Arterial Promedio</p>
-              <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>{stats.avgSystolicBP}/{stats.avgDiastolicBP}</p>
-              <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '4px' }}>Basado en {stats.bpReadingsCount} lecturas</p>
+              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Pruebas de Laboratorio</p>
+              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#8b5cf6' }}>{stats.clinicalMetrics?.totalLabTests || 0}</p>
+              <p style={{ color: '#8b5cf6', fontSize: '14px', marginTop: '4px' }}>{stats.clinicalMetrics?.criticalLabResults || 0} críticas</p>
             </div>
-            <div style={{ fontSize: '36px' }}>💓</div>
+            <div style={{ fontSize: '36px' }}>🔬</div>
           </div>
         </div>
 
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Programa CALM</p>
-              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#1f2937' }}>{stats.calmProgramEnrollment}</p>
-              <p style={{ color: '#22c55e', fontSize: '14px', marginTop: '4px' }}>{stats.calmProgramPercentage}% inscritos</p>
+              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Diagnósticos Totales</p>
+              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#10b981' }}>{stats.clinicalMetrics?.totalDiagnoses || 0}</p>
+              <p style={{ color: '#10b981', fontSize: '14px', marginTop: '4px' }}>Condiciones activas</p>
             </div>
-            <div style={{ fontSize: '36px' }}>🫀</div>
+            <div style={{ fontSize: '36px' }}>📋</div>
+          </div>
+        </div>
+
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '8px' }}>Medicamentos Administrados</p>
+              <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#f59e0b' }}>{stats.clinicalMetrics?.medicationsManaged || 0}</p>
+              <p style={{ color: '#f59e0b', fontSize: '14px', marginTop: '4px' }}>Tratamientos activos</p>
+            </div>
+            <div style={{ fontSize: '36px' }}>💊</div>
           </div>
         </div>
       </div>
