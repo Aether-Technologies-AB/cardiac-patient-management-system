@@ -1,4 +1,4 @@
-import api, { mockApi } from './api';
+import { mockApi } from './api';
 
 const login = async (email, password) => {
   // Use mock API for testing

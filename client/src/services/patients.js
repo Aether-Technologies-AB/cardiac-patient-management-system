@@ -1,4 +1,4 @@
-import api, { mockApi } from './api';
+import { mockApi } from './api';
 
 const getPatients = () => {
   // Use mock API for testing

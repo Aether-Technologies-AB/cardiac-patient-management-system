@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useAuth from '../../hooks/useAuth';
-import api, { mockApi } from '../../services/api';
+import { mockApi } from '../../services/api';
 
 const DashboardHome = () => {
   const { logout } = useAuth();
