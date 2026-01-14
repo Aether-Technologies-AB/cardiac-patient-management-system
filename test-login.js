@@ -1,0 +1,53 @@
+const admin = require('firebase-admin');
+const bcrypt = require('bcryptjs');
+
+// Initialize Firebase with hardcoded credentials
+const serviceAccount = {
+  projectId: "cardiac-management-system",
+  clientEmail: "firebase-adminsdk-fbsvc@cardiac-management-system.iam.gserviceaccount.com",
+  privateKey: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCnMx29GxO3knYb\nkH/w6XDN1SecOvltNe1bdTBAU8hwTP6qRQMikcowgAwqTrQouBje7okLE76P60U2\nYsIx5Rx8m42Ai8mLJGBoCenmt8yv8epXWWTK6NjWTcp1+H54yyYgalCVDmoD4H6Z\n0/urO8b8lG6P+c8cI1k1LZEeR5FJTxDVmoHEZDTm521jaEihJ/nnEKAyQ1iG4D+b\n4J4ssjVb1+9HVKd4ggDSx+sfUxtV5E1lo18uM9ErKgB8MuL4qA1sEfn56Ek/Y6oI\nsaRsDHXQ8pb8rWMPj/Rl/l0IT99nPqmdSweQSVtPyp3uzz/R3j91J9gUlfEcVf5s\nVPenq4GnAgMBAAECggEAURBc7kc2/41QmxurlEOyL/GVI0+KiBMZ0fpW2xFkAGKs\nJCSSmQujQnGKtGZ1PbrIQCnZote/UCrK40vtiGBjN9z5NaZQoJgR789CqtxZLsL1\nEcWjMyfCneCYdSr2Mp2YDiZNjH8xElEhQHbBMaupVeOnWUHOUv+mbDx7+/jJ7YbR\n5Zn1B1bkBIN8u80xcn9xziiyuMzh0C07AUFXMXmmPIQZX7VO3sf9PC7LPBE+vEew\nMV4yvztONwihUNk0i45//hxPivbYhbUzMaA96w49JkcF97s8PQPwP5GLtQb67wkV\nmghFzPT0rRgK3xG5dUqmBQUzFoO2v1A+Ba09T7nKQQKBgQDSvgWP6h9ODNAZ9mAy\nVYEZnDw7ni23ubPw3vvQo2umzB+/HFWFXpAfxrqEZULtDRYfeu367lMUQzrAmeNE\n/kxg260WXTZG7druWjPufEpSiHg5YWkGZqZ8VALSpCzj0J+b1GzbJS3BiZQ+/f8a\nwthC3J+LU/bshTpYs3PUtRcnZwKBgQDLG0C68XxC0h5wIkcDNR0oxCT/cyfV5SdZ\n55iN0RIgLqgk25h7MDwrpLQuZBPS9OUKagjhBn46aF1mIjzAxedzX0P1t6yiosPH\nKv4wDPqgUfKEtUCl5NU0QJWqGycg17+Dc/FB4DHieFumW+tHnjtQ5oteWtE948vn\nGHNpUNOrwQKBgQCz+ADKAPcQ8VI6CbPm6Cwi0dCCXTfPoW/wcIx9hUGmpMUrsKe8\nCKBt8olQDSXVSIqvAYz/8MzUDgG7fu+d+MkDIjazVZDHi9KeIDwfGtdhmheJcQ1+\noOTmYdwzRG7tcjkLm6IGl752e+Y00TYtBV4n4z8AfgjtvWyxWTa+3JNUWwKBgQCp\nZ1O4GQ6xlRu6H3znWfe2NtM9FUlWiEkoHZkKQCVEHmY0R8yIgxTMuhVm1CYMwCIB\na6t4NLg38zBjrY7KosaHXiAK5GXjSKrOhjd40HqCGZeTxLHlLFX/vRaXyQn7xLeB\n5sSFU3+ICyc2PFijZYDH22LHEiyP2F4LpEMuxjGmgQKBgA5wmN9BdbWraUJvVRYv\ne3EQzy31EQCJREQas4Y0IjqvYMMhZyTXIsE82koX5/CjMHQxYpgwFTJumwoK0GUt\nQi6w3Dt9J4oywVxMl7VTVFjeKJ2HN7/vLpR9ZFClrYKuJMmNEl5hVGTmdtyGeI1q\nSnw9mn2ojcwCqxcpbmbGkCla\n-----END PRIVATE KEY-----"
+};
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://cardiac-management-system.firebaseio.com'
+  });
+}
+
+const db = admin.firestore();
+
+async function testLogin() {
+  try {
+    console.log('🔍 Testing login process...');
+    
+    // Find user by email
+    const usersSnapshot = await db.collection('users').where('email', '==', 'admin@cardiac.com').get();
+    
+    if (usersSnapshot.empty) {
+      console.log('❌ User not found');
+      return;
+    }
+    
+    const userDoc = usersSnapshot.docs[0];
+    const user = { id: userDoc.id, ...userDoc.data() };
+    
+    console.log('✅ User found:', user.email);
+    console.log('🔑 Password hash exists:', !!user.password_hash);
+    
+    // Test password match
+    const isMatch = await bcrypt.compare('admin123', user.password_hash);
+    console.log('🔐 Password match:', isMatch);
+    
+    if (isMatch) {
+      console.log('🎉 Login should work!');
+    } else {
+      console.log('❌ Password does not match');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+  }
+}
+
+testLogin();
