@@ -7,7 +7,7 @@ class User {
 
   static async create(userData) {
     const id = uuidv4();
-    const hashedPassword = await bcrypt.hash(userData.password_hash, 10);
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
     
     const user = {
       id,
