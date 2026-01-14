@@ -32,14 +32,14 @@ const getStats = async (req, res, next) => {
       },
       {
         id: 4,
-        type: 'medication_updated',
-        message: 'Medication adjusted for Mary Williams',
+        type: 'lab_results',
+        message: 'Lab results available for Michael Miller (INR: 2.3)',
         timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
       },
       {
         id: 5,
-        type: 'lab_results',
-        message: 'Lab results available for Michael Miller',
+        type: 'diagnosis_added',
+        message: 'New diagnosis for Patricia Davis: Mitral valve prolapse',
         timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
       }
     ],
@@ -63,16 +63,30 @@ const getStats = async (req, res, next) => {
         'High Cholesterol': 3
       }
     },
+    clinicalMetrics: {
+      totalVitalsRecorded: 12,
+      totalLabTests: 11,
+      totalDiagnoses: 13,
+      criticalLabResults: 3,
+      abnormalVitals: 4,
+      medicationsManaged: 15,
+      averageAge: 68
+    },
     appointmentsToday: 3,
     pendingTasks: 4,
-    medicationsManaged: 15,
-    averageAge: 68,
     riskFactors: {
       highBloodPressure: 4,
       diabetes: 2,
       smoking: 1,
       obesity: 2,
       familyHistory: 3
+    },
+    medicationStats: {
+      antihypertensives: 6,
+      anticoagulants: 2,
+      statins: 5,
+      diabetic_meds: 2,
+      beta_blockers: 3
     }
   };
 
