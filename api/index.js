@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { db } = require('../backend/src/config/firebase');
+const { db } = require('./config/firebase');
 
 const app = express();
 
@@ -15,10 +15,10 @@ db.collection('test').doc('connection').set({ connected: true, timestamp: new Da
   .catch(err => console.log('Error: ' + err));
 
 // Mount routers
-app.use('/api/auth', require('../backend/src/routes/auth.routes'));
-app.use('/api/patients', require('../backend/src/routes/patients.routes'));
-app.use('/api/users', require('../backend/src/routes/users.routes'));
-app.use("/api/dashboard", require("../backend/src/routes/dashboard.routes"));
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/patients', require('./routes/patients.routes'));
+app.use('/api/users', require('./routes/users.routes'));
+app.use("/api/dashboard", require("./routes/dashboard.routes"));
 
 // Basic route
 app.get('/', (req, res) => {
