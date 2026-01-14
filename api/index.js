@@ -16,9 +16,12 @@ db.collection('test').doc('connection').set({ connected: true, timestamp: new Da
 
 // Mount routers
 app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/mock-auth', require('./routes/mock-auth.routes'));
 app.use('/api/patients', require('./routes/patients.routes'));
+app.use('/api/mock-patients', require('./routes/mock-patients.routes'));
 app.use('/api/users', require('./routes/users.routes'));
 app.use("/api/dashboard", require("./routes/dashboard.routes"));
+app.use("/api/mock-dashboard", require("./routes/mock-dashboard.routes"));
 app.use("/api/test", require("./routes/test.routes"));
 
 // Basic route

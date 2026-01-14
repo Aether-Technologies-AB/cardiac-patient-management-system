@@ -18,4 +18,22 @@ api.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
+// Create mock API instance for testing
+export const mockApi = axios.create({
+  baseURL: 'https://windsurf-project-livid.vercel.app/api',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+mockApi.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
+
 export default api;

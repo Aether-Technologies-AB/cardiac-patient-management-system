@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useAuth from '../../hooks/useAuth';
-import api from '../../services/api';
+import api, { mockApi } from '../../services/api';
 
 const DashboardHome = () => {
   const { logout } = useAuth();
@@ -28,7 +28,8 @@ const DashboardHome = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/dashboard/stats');
+      // Use mock API for testing
+      const response = await mockApi.get('/mock-dashboard/stats');
       console.log('Dashboard stats:', response.data);
       if (response.data.success) {
         setStats(response.data.data);

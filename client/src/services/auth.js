@@ -1,7 +1,8 @@
-import api from './api';
+import api, { mockApi } from './api';
 
 const login = async (email, password) => {
-  const response = await api.post('/auth/login', { email, password });
+  // Use mock API for testing
+  const response = await mockApi.post('/mock-auth/login', { email, password });
   if (response.data.token) {
     localStorage.setItem('token', response.data.token);
   }
@@ -9,7 +10,8 @@ const login = async (email, password) => {
 };
 
 const register = async (userData) => {
-  const response = await api.post('/auth/register', userData);
+  // Use mock API for testing
+  const response = await mockApi.post('/mock-auth/register', userData);
   if (response.data.token) {
     localStorage.setItem('token', response.data.token);
   }
