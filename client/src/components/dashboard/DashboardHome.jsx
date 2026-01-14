@@ -9,10 +9,32 @@ const DashboardHome = () => {
     totalPatients: 0,
     totalDiagnoses: 0,
     totalVitals: 0,
-    totalMedications: 0,
+    totalLabTests: 0,
+    criticalPatients: 0,
+    highRiskPercentage: 0,
+    clinicalMetrics: {
+      totalVitalsRecorded: 0,
+      totalLabTests: 0,
+      totalDiagnoses: 0,
+      criticalLabResults: 0,
+      abnormalVitals: 0,
+      medicationsManaged: 0
+    },
+    medicationStats: {
+      antihypertensives: 0,
+      anticoagulants: 0,
+      statins: 0,
+      diabetic_meds: 0,
+      beta_blockers: 0
+    },
     riskFactors: {},
     highRiskPatients: 0,
-    highRiskPercentage: 0,
+    recentActivity: [],
+    patientDistribution: {
+      byGender: {},
+      byAgeGroup: {},
+      byCondition: {}
+    },
     avgSystolicBP: 0,
     avgDiastolicBP: 0,
     bpReadingsCount: 0,
