@@ -1,4 +1,4 @@
-const { Patient } = require('../models/PatientFirebase');
+const Patient = require('../models/PatientFirebase');
 const { db } = require('../config/firebase');
 
 // @desc    Get all patients

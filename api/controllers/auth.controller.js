@@ -1,4 +1,4 @@
-const { User } = require('../models/UserFirebase');
+const User = require('../models/UserFirebase');
 const { db } = require('../config/firebase');
 const jwt = require('jsonwebtoken');
 

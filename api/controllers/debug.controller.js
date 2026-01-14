@@ -1,4 +1,4 @@
-const { User } = require('../models/UserFirebase');
+const User = require('../models/UserFirebase');
 
 // @desc    Debug login process
 // @route   POST /api/debug/login
