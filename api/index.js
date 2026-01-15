@@ -8,17 +8,43 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Mount routers
-app.use('/api/mock-auth', require('./routes/mock-auth.routes'));
-app.use('/api/mock-patients', require('./routes/mock-patients.routes'));
-app.use("/api/mock-dashboard", require("./routes/mock-dashboard.routes"));
-app.use('/api/mock-vitals', require('./routes/mock-vitals.routes'));
-app.use('/api/mock-diagnoses', require('./routes/mock-diagnoses.routes'));
-app.use('/api/mock-labs', require('./routes/mock-labs.routes'));
+// Import routes
+const authRoutes = require('./routes/mock-auth.routes');
+const dashboardRoutes = require('./routes/mock-dashboard.routes');
+const patientsRoutes = require('./routes/mock-patients.routes');
+const vitalsRoutes = require('./routes/mock-vitals.routes');
+const diagnosesRoutes = require('./routes/mock-diagnoses.routes');
+const labsRoutes = require('./routes/mock-labs.routes');
 
-// Basic route
+// Mount routes with clean paths
+app.use('/api/auth', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/patients', patientsRoutes);
+app.use('/api/vitals', vitalsRoutes);
+app.use('/api/diagnoses', diagnosesRoutes);
+app.use('/api/labs', labsRoutes);
+
+// Health check
 app.get('/', (req, res) => {
   res.send('Cardiac Patient Management System API is running...');
 });
 
+app.get('/api', (req, res) => {
+  res.json({ 
+    status: 'running',
+    message: 'Cardiac Patient Management System API',
+    endpoints: [
+      '/api/auth/login',
+      '/api/auth/register',
+      '/api/dashboard/stats',
+      '/api/patients',
+      '/api/patients/:id',
+      '/api/vitals/:patientId',
+      '/api/diagnoses/:patientId',
+      '/api/labs/:patientId'
+    ]
+  });
+});
+
+// For Vercel serverless
 module.exports = app;
