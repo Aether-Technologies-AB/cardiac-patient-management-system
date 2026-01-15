@@ -2,27 +2,27 @@ import { mockApi } from './api';
 
 const getPatients = () => {
   // Use mock API for testing
-  return mockApi.get('/mock-patients');
+  return mockApi.get('/patients');
 };
 
 const getPatient = (id) => {
   // Use mock API for testing
-  return mockApi.get(`/mock-patients/${id}`);
+  return mockApi.get(`/patients/${id}`);
 };
 
 const createPatient = (patientData) => {
   // Use mock API for testing
-  return mockApi.post('/mock-patients', patientData);
+  return mockApi.post('/patients', patientData);
 };
 
 const updatePatient = (id, patientData) => {
   // Use mock API for testing
-  return mockApi.put(`/mock-patients/${id}`, patientData);
+  return mockApi.put(`/patients/${id}`, patientData);
 };
 
 const deletePatient = (id) => {
   // Use mock API for testing
-  return mockApi.delete(`/mock-patients/${id}`);
+  return mockApi.delete(`/patients/${id}`);
 };
 
 const patientService = {

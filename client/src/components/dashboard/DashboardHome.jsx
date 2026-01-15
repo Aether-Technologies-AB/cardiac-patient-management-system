@@ -51,7 +51,7 @@ const DashboardHome = () => {
   const fetchStats = async () => {
     try {
       // Use mock API for testing
-      const response = await mockApi.get('/mock-dashboard/stats');
+      const response = await mockApi.get('/dashboard/stats');
       console.log('Dashboard stats:', response.data);
       if (response.data.success) {
         setStats(response.data.data);

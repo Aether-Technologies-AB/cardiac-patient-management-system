@@ -1,15 +1,15 @@
 import { mockApi } from './api';
 
 const getPatientDiagnoses = (patientId) => {
-  return mockApi.get(`/mock-diagnoses/${patientId}`);
+  return mockApi.get(`/diagnoses/${patientId}`);
 };
 
 const getAllDiagnoses = () => {
-  return mockApi.get('/mock-diagnoses');
+  return mockApi.get('/diagnoses');
 };
 
 const createDiagnosis = (diagnosisData) => {
-  return mockApi.post('/mock-diagnoses', diagnosisData);
+  return mockApi.post('/diagnoses', diagnosisData);
 };
 
 const diagnosesService = {

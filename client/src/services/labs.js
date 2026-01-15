@@ -1,15 +1,15 @@
 import { mockApi } from './api';
 
 const getPatientLabs = (patientId) => {
-  return mockApi.get(`/mock-labs/${patientId}`);
+  return mockApi.get(`/labs/${patientId}`);
 };
 
 const getAllLabs = () => {
-  return mockApi.get('/mock-labs');
+  return mockApi.get('/labs');
 };
 
 const createLab = (labData) => {
-  return mockApi.post('/mock-labs', labData);
+  return mockApi.post('/labs', labData);
 };
 
 const labsService = {

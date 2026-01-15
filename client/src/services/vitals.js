@@ -1,15 +1,15 @@
 import { mockApi } from './api';
 
 const getPatientVitals = (patientId) => {
-  return mockApi.get(`/mock-vitals/${patientId}`);
+  return mockApi.get(`/vitals/${patientId}`);
 };
 
 const getAllVitals = () => {
-  return mockApi.get('/mock-vitals');
+  return mockApi.get('/vitals');
 };
 
 const createVitals = (vitalData) => {
-  return mockApi.post('/mock-vitals', vitalData);
+  return mockApi.post('/vitals', vitalData);
 };
 
 const vitalsService = {
