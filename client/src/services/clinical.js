@@ -2,31 +2,31 @@ import api from './api';
 
 // Vitals
 const getVitalsForPatient = (patientId) => {
-  return api.get(`/patients/${patientId}/vitals`);
+  return api.get(`/vitals/${patientId}`);
 };
 
 const addVitalsForPatient = (patientId, vitalsData) => {
-  return api.post(`/patients/${patientId}/vitals`, vitalsData);
+  return api.post(`/vitals/${patientId}`, vitalsData);
 };
 
-// Medications
-const getMedicationsForPatient = (patientId) => {
-  return api.get(`/patients/${patientId}/medications`);
+// Medications (endpoint doesn't exist yet, return empty)
+const getMedicationsForPatient = async (patientId) => {
+  return Promise.resolve({ data: { success: true, data: [] } });
 };
 
 // Lab Results
 const getLabsForPatient = (patientId) => {
-  return api.get(`/patients/${patientId}/labs`);
+  return api.get(`/labs/${patientId}`);
 };
 
 // Diagnoses
 const getDiagnosesForPatient = (patientId) => {
-  return api.get(`/patients/${patientId}/diagnoses`);
+  return api.get(`/diagnoses/${patientId}`);
 };
 
-// Procedures
-const getProceduresForPatient = (patientId) => {
-  return api.get(`/patients/${patientId}/procedures`);
+// Procedures (endpoint doesn't exist yet, return empty)
+const getProceduresForPatient = async (patientId) => {
+  return Promise.resolve({ data: { success: true, data: [] } });
 };
 
 const clinicalService = {
